@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: Tree Management API
+  description: API para gestionar estructuras jerárquicas tipo árbol
+  version: 1.0.0
+
+paths:
+
+  /nodes/root:
+    post:
+      summary: Crear nodo raíz
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNodeRequest'
+      responses:
+        '200':
+          description: Nodo raíz creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeResponse'
+
+  /nodes/{parentId}/children:
+    post:
+      summary: Agregar hijo a un nodo
+      parameters:
+        - name: parentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNodeRequest'
+      responses:
+        '200':
+          description: Nodo hijo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeResponse'
+
+  /tree:
+    get:
+      summary: Obtener árbol completo
+      responses:
+        '200':
+          description: Árbol completo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TreeNode'
+
+components:
+  schemas:
+
+    CreateNodeRequest:
+      type: object
+      properties:
+        value:
+          type: string
+      required:
+        - value
+
+    NodeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          type: string
+        parentId:
+          type: integer
+          format: int64
+          nullable: true
+
+    TreeNode:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/TreeNode'
