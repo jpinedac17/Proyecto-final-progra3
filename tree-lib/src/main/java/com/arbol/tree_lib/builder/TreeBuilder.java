@@ -2,21 +2,22 @@ package com.arbol.tree_lib.builder;
 
 import com.arbol.tree_lib.model.TreeNode;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TreeBuilder {
 
     public static TreeNode build(List<NodeFlat> nodes) {
 
-        Map<Long, TreeNode> map = new HashMap<>();
+        // 🔹 Convertir List → Array (permitido solo como entrada)
+        NodeFlat[] nodeArray = nodes.toArray(new NodeFlat[0]);
+        TreeNode[] created = new TreeNode[nodeArray.length];
+
         TreeNode root = null;
 
         // 🔹 Validar cantidad de raíces
         int rootCount = 0;
-        for (NodeFlat n : nodes) {
-            if (n.getParentId() == null) {
+        for (int i = 0; i < nodeArray.length; i++) {
+            if (nodeArray[i].getParentId() == null) {
                 rootCount++;
             }
         }
@@ -26,31 +27,46 @@ public class TreeBuilder {
         }
 
         // 🔹 Crear nodos
-        for (NodeFlat n : nodes) {
-            map.put(n.getId(), new TreeNode(n.getId(), n.getValue()));
+        for (int i = 0; i < nodeArray.length; i++) {
+            created[i] = new TreeNode(
+                    nodeArray[i].getId(),
+                    nodeArray[i].getValue()
+            );
         }
 
         // 🔹 Conectar relaciones
-        for (NodeFlat n : nodes) {
+        for (int i = 0; i < nodeArray.length; i++) {
 
-            if (n.getParentId() == null) {
-                root = map.get(n.getId());
+            TreeNode current = findNode(created, nodeArray[i].getId());
+
+            if (nodeArray[i].getParentId() == null) {
+                root = current;
             } else {
-                TreeNode parent = map.get(n.getParentId());
+
+                TreeNode parent = findNode(created, nodeArray[i].getParentId());
 
                 if (parent == null) {
-                    throw new RuntimeException("Parent not found: " + n.getParentId());
+                    throw new RuntimeException("Parent not found: " + nodeArray[i].getParentId());
                 }
 
-                parent.addChild(map.get(n.getId()));
+                parent.addChild(current);
             }
         }
 
-        // 🔹 Validar que sí haya raíz
         if (root == null) {
             throw new RuntimeException("Tree must have a root");
         }
 
         return root;
+    }
+
+    // 🔍 Búsqueda manual
+    private static TreeNode findNode(TreeNode[] nodes, Long id) {
+        for (int i = 0; i < nodes.length; i++) {
+            if (nodes[i].getId().equals(id)) {
+                return nodes[i];
+            }
+        }
+        return null;
     }
 }
