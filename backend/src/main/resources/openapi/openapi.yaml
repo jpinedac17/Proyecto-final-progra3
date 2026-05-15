@@ -58,6 +58,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/TreeNode'
 
+  /tree/{nodeId}:
+    get:
+      summary: Obtener subárbol desde un nodo
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Subárbol desde el nodo indicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TreeNode'
+
 components:
   schemas:
 
