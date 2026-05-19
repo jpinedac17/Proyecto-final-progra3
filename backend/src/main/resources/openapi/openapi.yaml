@@ -5,9 +5,9 @@ info:
   version: 1.0.0
 
 paths:
-
   /nodes/root:
     post:
+      operationId: createRoot
       summary: Crear nodo raíz
       requestBody:
         required: true
@@ -25,6 +25,7 @@ paths:
 
   /nodes/{parentId}/children:
     post:
+      operationId: addChild
       summary: Agregar hijo a un nodo
       parameters:
         - name: parentId
@@ -49,6 +50,7 @@ paths:
 
   /tree:
     get:
+      operationId: getTree
       summary: Obtener árbol completo
       responses:
         '200':
@@ -56,36 +58,134 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TreeNode'
+                $ref: '#/components/schemas/TreeNodeResponse'
 
   /tree/{nodeId}:
     get:
+      operationId: getSubTree
       summary: Obtener subárbol desde un nodo
       parameters:
-        - name: nodeId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/NodeId'
       responses:
         '200':
           description: Subárbol desde el nodo indicado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TreeNode'
+                $ref: '#/components/schemas/TreeNodeResponse'
+
+  /nodes/{nodeId}/path:
+    get:
+      operationId: getPath
+      summary: Ruta desde la raíz hasta un nodo
+      parameters:
+        - $ref: '#/components/parameters/NodeId'
+      responses:
+        '200':
+          description: Ruta desde la raíz hasta el nodo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NodeSimpleResponse'
+
+  /tree/traversal:
+    get:
+      operationId: getTraversal
+      summary: Recorrido DFS o BFS
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - DFS
+              - BFS
+      responses:
+        '200':
+          description: Recorrido solicitado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NodeSimpleResponse'
+
+  /tree/height:
+    get:
+      operationId: getHeight
+      summary: Altura del árbol
+      responses:
+        '200':
+          description: Altura del árbol
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeightResponse'
+
+  /nodes/{nodeId}/depth:
+    get:
+      operationId: getDepth
+      summary: Profundidad de un nodo
+      parameters:
+        - $ref: '#/components/parameters/NodeId'
+      responses:
+        '200':
+          description: Profundidad del nodo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepthResponse'
+
+  /nodes/{nodeId}/ancestors:
+    get:
+      operationId: getAncestors
+      summary: Ancestros de un nodo
+      parameters:
+        - $ref: '#/components/parameters/NodeId'
+      responses:
+        '200':
+          description: Ancestros del nodo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NodeSimpleResponse'
+
+  /tree/validate:
+    get:
+      operationId: validateTree
+      summary: Validar si el árbol no tiene ciclos
+      responses:
+        '200':
+          description: Resultado de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateResponse'
 
 components:
-  schemas:
+  parameters:
+    NodeId:
+      name: nodeId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
 
+  schemas:
     CreateNodeRequest:
       type: object
+      required:
+        - value
       properties:
         value:
           type: string
-      required:
-        - value
+          example: Jutiapa
 
     NodeResponse:
       type: object
@@ -93,22 +193,62 @@ components:
         id:
           type: integer
           format: int64
+          example: 2
         value:
           type: string
+          example: Jutiapa
         parentId:
           type: integer
           format: int64
           nullable: true
+          example: 1
 
-    TreeNode:
+    NodeSimpleResponse:
       type: object
       properties:
         id:
           type: integer
           format: int64
+          example: 2
         value:
           type: string
+          example: Jutiapa
+
+    TreeNodeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        value:
+          type: string
+          example: Guatemala
         children:
           type: array
           items:
-            $ref: '#/components/schemas/TreeNode'
+            $ref: '#/components/schemas/TreeNodeResponse'
+
+    HeightResponse:
+      type: object
+      properties:
+        height:
+          type: integer
+          example: 4
+
+    DepthResponse:
+      type: object
+      properties:
+        depth:
+          type: integer
+          example: 2
+
+    ValidateResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          example: true
+        hasCycle:
+          type: boolean
+          example: false
