@@ -1,8 +1,11 @@
 package com.app.backend.repository;
 
 import com.app.backend.model.Node;
+import org.springframework.stereotype.Repository;
+
 import java.util.*;
 
+@Repository
 public class MemoryRepository implements TreeRepository {
 
     private final Map<Long, Node> storage = new HashMap<>();
