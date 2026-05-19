@@ -4,53 +4,13 @@ import com.arbol.tree_lib.model.TreeNode;
 
 public class TreeOperations {
 
-    private TreeNode root;
-    
-    // 1. CREAR RAÍZ
-    public TreeNode createRoot(Long id, String value) {
-        if (root != null) {
-            throw new RuntimeException("Root already exists");
-        }
-
-        root = new TreeNode(id, value);
-        return root;
-    }
-
-    // 2. AGREGAR HIJO
-    public TreeNode addChild(Long parentId, Long id, String value) {
-
-        if (root == null) {
-            throw new RuntimeException("Tree is empty");
-        }
-
-        TreeNode parent = findNode(root, parentId);
-
-        if (parent == null) {
-            throw new RuntimeException("Parent not found");
-        }
-
-        TreeNode child = new TreeNode(id, value);
-        parent.addChild(child);
-
-        return child;
-    }
-
-    // 3. OBTENER ÁRBOL COMPLETO
-    public TreeNode getTree() {
-        if (root == null) {
-            throw new RuntimeException("Tree is empty");
-        }
-
-        return root;
-    }
-
     // 4. SUBÁRBOL
-    public TreeNode getSubTree(Long id) {
+    public TreeNode getSubTree(TreeNode root, Long id) {
         return findNode(root, id);
     }
 
-    // 5. RUTA DESDE RAÍZ DE UN NODO
-    public TreeNode[] getPath(Long id) {
+    // 5. RUTA
+    public TreeNode[] getPath(TreeNode root, Long id) {
         TreeNode[] path = new TreeNode[100];
         int[] size = new int[1];
 
@@ -78,8 +38,8 @@ public class TreeOperations {
         return false;
     }
 
-    // 6. Recorrido DFS
-    public TreeNode[] dfs() {
+    // 6. DFS
+    public TreeNode[] dfs(TreeNode root) {
         TreeNode[] result = new TreeNode[100];
         int[] size = new int[1];
 
@@ -100,8 +60,8 @@ public class TreeOperations {
         }
     }
 
-    // 7. Recorrido BFS
-    public TreeNode[] bfs() {
+    // 7. BFS
+    public TreeNode[] bfs(TreeNode root) {
         if (root == null) return new TreeNode[0];
 
         TreeNode[] result = new TreeNode[100];
@@ -126,8 +86,8 @@ public class TreeOperations {
         return copy(result, size);
     }
 
-    // 8. ALTURA DEL ÁRBOL
-    public int height() {
+    // 8. ALTURA
+    public int height(TreeNode root) {
         return heightHelper(root);
     }
 
@@ -145,16 +105,16 @@ public class TreeOperations {
         return max + 1;
     }
 
-    // 9. PROFUNDIDAD DE UN NODO
-    public int depth(Long id) {
-        TreeNode[] path = getPath(id);
+    // 9. PROFUNDIDAD
+    public int depth(TreeNode root, Long id) {
+        TreeNode[] path = getPath(root, id);
         if (path.length == 0) return -1;
         return path.length - 1;
     }
 
-    // 10. ANCESTROS DE UN NODO
-    public TreeNode[] ancestors(Long id) {
-        TreeNode[] path = getPath(id);
+    // 10. ANCESTROS
+    public TreeNode[] getAncestors(TreeNode root, Long id) {
+        TreeNode[] path = getPath(root, id);
 
         if (path.length <= 1) return new TreeNode[0];
 
@@ -167,8 +127,8 @@ public class TreeOperations {
         return result;
     }
 
-    // 11. VALIDAR CICLOS
-    public boolean validate() {
+    // 11. VALIDAR
+    public boolean validate(TreeNode root) {
         return hasCycle(root, new TreeNode[100], new int[1]);
     }
 
@@ -191,7 +151,7 @@ public class TreeOperations {
         return false;
     }
 
-    // AUX: BUSCAR NODO
+    // AUX
     private TreeNode findNode(TreeNode node, Long id) {
         if (node == null) return null;
 
@@ -207,7 +167,6 @@ public class TreeOperations {
         return null;
     }
 
-    // 	AUX: COPIAR ARRAY
     private TreeNode[] copy(TreeNode[] original, int size) {
         TreeNode[] result = new TreeNode[size];
         for (int i = 0; i < size; i++) {
