@@ -2,6 +2,8 @@ services:
   mongo:
     image: mongo:7
     container_name: territorial-tree-mongo
+    environment:
+      MONGO_INITDB_DATABASE: territorial_tree_db
     ports:
       - "27017:27017"
     volumes:
