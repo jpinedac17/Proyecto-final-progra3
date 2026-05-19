@@ -1,7 +1,10 @@
 package com.app.backend.repository.postgres;
 
+import org.springframework.context.annotation.Profile;
+
 import com.app.backend.model.Node;
 
+@Profile("postgres")
 public final class NodeEntityMapper {
 
     private NodeEntityMapper() {

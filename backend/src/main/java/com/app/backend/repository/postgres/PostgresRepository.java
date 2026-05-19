@@ -3,12 +3,14 @@ package com.app.backend.repository.postgres;
 import com.app.backend.model.Node;
 import com.app.backend.repository.TreeRepository;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Profile("postgres")
 @Primary
 public class PostgresRepository implements TreeRepository {
 

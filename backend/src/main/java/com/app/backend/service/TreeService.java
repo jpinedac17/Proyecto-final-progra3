@@ -45,7 +45,13 @@ public class TreeService {
     // 3. Obtener árbol completo
     public TreeNode getTree() {
 
-        List<NodeFlat> flat = repo.findAll().stream()
+        List<Node> nodes = repo.findAll();
+
+        if (nodes.isEmpty()) {
+            throw new RuntimeException("El árbol está vacío");
+        }
+
+        List<NodeFlat> flat = nodes.stream()
                 .map(n -> new NodeFlat(n.getId(), n.getValue(), n.getParentId()))
                 .toList();
 
