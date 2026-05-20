@@ -1,7 +1,9 @@
 package com.app.backend.repository.mongo;
 
+import com.app.backend.config.MongoCondition;
 import com.app.backend.model.Node;
 import com.app.backend.repository.TreeRepository;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -11,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 @Profile("mongo")
+@Conditional(MongoCondition.class)
 @Primary
 public class MongoTreeRepository implements TreeRepository {
 
