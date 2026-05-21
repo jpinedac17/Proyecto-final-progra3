@@ -1,6 +1,6 @@
 package com.app.backend.repository.postgres;
 
-import org.springframework.context.annotation.Profile;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "nodes")
-@Profile("postgres")
+
 public class NodeEntity {
 
     @Id
