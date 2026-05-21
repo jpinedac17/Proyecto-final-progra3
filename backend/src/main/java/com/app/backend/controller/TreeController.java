@@ -129,12 +129,12 @@ public class TreeController implements NodesApi, TreeApi {
     @Override
     public ResponseEntity<ValidateResponse> validateTree() {
 
-        boolean hasCycle = service.validate();
+        boolean valid = service.validate();
 
         ValidateResponse response = new ValidateResponse();
 
-        response.setHasCycle(hasCycle);
-        response.setValid(!hasCycle);
+        response.setValid(valid);
+        response.setHasCycle(!valid);
 
         return ResponseEntity.ok(response);
     }
