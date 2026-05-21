@@ -45,7 +45,6 @@ public class TreeService {
 
     // 3. Obtener árbol completo
     public TreeNode getTree() {
-
         List<Node> nodes = repo.findAll();
 
         if (nodes.isEmpty()) {
@@ -73,10 +72,11 @@ public class TreeService {
 
     // 6 y 7. DFS / BFS
     public TreeNode[] getTraversal(String type) {
-
         if ("DFS".equalsIgnoreCase(type)) {
             return strategy.dfs(getTree()).toArray(new TreeNode[0]);
-        } else if ("BFS".equalsIgnoreCase(type)) {
+        }
+
+        if ("BFS".equalsIgnoreCase(type)) {
             return strategy.bfs(getTree()).toArray(new TreeNode[0]);
         }
 
