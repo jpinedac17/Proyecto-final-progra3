@@ -5,7 +5,7 @@ import com.app.backend.repository.TreeRepository;
 import com.arbol.tree_lib.builder.NodeFlat;
 import com.arbol.tree_lib.builder.TreeBuilder;
 import com.arbol.tree_lib.model.TreeNode;
-import com.arbol.tree_lib.operations.TreeOperations;
+import com.arbol.tree_lib.strategy.TreeAlgorithmStrategy;
 
 import org.springframework.stereotype.Service;
 
@@ -15,12 +15,13 @@ import java.util.List;
 public class TreeService {
 
     private final TreeRepository repo;
-    private final TreeOperations operations = new TreeOperations();
+    private final TreeAlgorithmStrategy strategy;
 
     private Long idCounter = 1L;
 
-    public TreeService(TreeRepository repo) {
+    public TreeService(TreeRepository repo, TreeAlgorithmStrategy strategy) {
         this.repo = repo;
+        this.strategy = strategy;
     }
 
     // 1. Crear raíz
@@ -35,7 +36,7 @@ public class TreeService {
 
     // 2. Agregar hijo
     public Node addChild(Long parentId, String value) {
-        Node parent = repo.findById(parentId)
+        repo.findById(parentId)
                 .orElseThrow(() -> new RuntimeException("No se encontró el nodo padre"));
 
         Node child = new Node(idCounter++, value, parentId);
@@ -60,21 +61,23 @@ public class TreeService {
 
     // 4. Subárbol
     public TreeNode getSubTree(Long nodeId) {
-        return operations.getSubTree(getTree(), nodeId);
+        return strategy.findSubTree(getTree(), nodeId)
+                .orElseThrow(() -> new RuntimeException("No se encontró el nodo"));
     }
 
     // 5. Ruta desde raíz
     public TreeNode[] getPath(Long nodeId) {
-        return operations.getPath(getTree(), nodeId);
+        return strategy.pathFromRoot(getTree(), nodeId)
+                .toArray(new TreeNode[0]);
     }
 
     // 6 y 7. DFS / BFS
     public TreeNode[] getTraversal(String type) {
 
         if ("DFS".equalsIgnoreCase(type)) {
-            return operations.dfs(getTree());
+            return strategy.dfs(getTree()).toArray(new TreeNode[0]);
         } else if ("BFS".equalsIgnoreCase(type)) {
-            return operations.bfs(getTree());
+            return strategy.bfs(getTree()).toArray(new TreeNode[0]);
         }
 
         throw new RuntimeException("Tipo de recorrido inválido");
@@ -82,21 +85,22 @@ public class TreeService {
 
     // 8. Altura
     public int getHeight() {
-        return operations.height(getTree());
+        return strategy.height(getTree());
     }
 
     // 9. Profundidad
     public int getDepth(Long nodeId) {
-        return operations.depth(getTree(), nodeId);
+        return strategy.depth(getTree(), nodeId);
     }
 
     // 10. Ancestros
     public TreeNode[] getAncestors(Long nodeId) {
-        return operations.getAncestors(getTree(), nodeId);
+        return strategy.ancestors(getTree(), nodeId)
+                .toArray(new TreeNode[0]);
     }
 
     // 11. Validar árbol
     public boolean validate() {
-        return operations.validate(getTree());
+        return strategy.validateNoCycles(getTree());
     }
 }
