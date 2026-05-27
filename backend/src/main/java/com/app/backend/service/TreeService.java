@@ -17,8 +17,6 @@ public class TreeService {
     private final TreeRepository repo;
     private final TreeAlgorithmStrategy strategy;
 
-    private Long idCounter = 1L;
-
     public TreeService(TreeRepository repo, TreeAlgorithmStrategy strategy) {
         this.repo = repo;
         this.strategy = strategy;
@@ -30,7 +28,7 @@ public class TreeService {
             throw new RuntimeException("Ya existe una raíz");
         }
 
-        Node root = new Node(idCounter++, value, null);
+        Node root = new Node(getNextId(), value, null);
         return repo.save(root);
     }
 
@@ -39,7 +37,7 @@ public class TreeService {
         repo.findById(parentId)
                 .orElseThrow(() -> new RuntimeException("No se encontró el nodo padre"));
 
-        Node child = new Node(idCounter++, value, parentId);
+        Node child = new Node(getNextId(), value, parentId);
         return repo.save(child);
     }
 
@@ -102,5 +100,13 @@ public class TreeService {
     // 11. Validar árbol
     public boolean validate() {
         return strategy.validateNoCycles(getTree());
+    }
+
+    private Long getNextId() {
+        return repo.findAll()
+                .stream()
+                .map(Node::getId)
+                .max(Long::compareTo)
+                .orElse(0L) + 1;
     }
 }
