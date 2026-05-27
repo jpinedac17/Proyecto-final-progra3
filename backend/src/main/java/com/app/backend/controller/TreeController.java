@@ -24,7 +24,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class TreeController implements NodesApi, TreeApi {
 
