@@ -1,0 +1,101 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: territorial-tree-postgres
+    profiles: ["postgres"]
+
+    environment:
+      POSTGRES_DB: territorial_tree_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d territorial_tree_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mongo:
+    image: mongo:7
+    container_name: territorial-tree-mongo
+    profiles: ["mongo"]
+
+    environment:
+      MONGO_INITDB_DATABASE: territorial_tree_db
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app-postgres:
+    build: .
+    container_name: territorial-tree-app-postgres
+    profiles: ["postgres"]
+
+    ports:
+      - "8082:8082"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      APP_STORAGE: postgres
+      APP_TREE_STRATEGY: collections
+
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/territorial_tree_db"
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app-mongo:
+    build: .
+    container_name: territorial-tree-app-mongo
+    profiles: ["mongo"]
+
+    ports:
+      - "8082:8082"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: mongo
+      APP_STORAGE: mongo
+      APP_TREE_STRATEGY: collections
+
+      SPRING_MONGODB_URI: "mongodb://mongo:27017/territorial_tree_db"
+      SPRING_MONGODB_DATABASE: territorial_tree_db
+
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  app-memory:
+    build: .
+    container_name: territorial-tree-app-memory
+    profiles: ["memory"]
+
+    ports:
+      - "8082:8082"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: memory
+      APP_STORAGE: memory
+      APP_TREE_STRATEGY: collections
+
+volumes:
+  postgres_data:
+  mongo_data:
