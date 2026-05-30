@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres:16
     container_name: territorial-tree-postgres
-    profiles: ["postgres"]
+    profiles: ["postgres", "postgres-custom"]
 
     environment:
       POSTGRES_DB: territorial_tree_db
@@ -25,7 +25,7 @@ services:
   mongo:
     image: mongo:7
     container_name: territorial-tree-mongo
-    profiles: ["mongo"]
+    profiles: ["mongo", "mongo-custom"]
 
     environment:
       MONGO_INITDB_DATABASE: territorial_tree_db
@@ -63,6 +63,27 @@ services:
       postgres:
         condition: service_healthy
 
+  app-postgres-custom:
+    build: .
+    container_name: territorial-tree-app-postgres-custom
+    profiles: ["postgres-custom"]
+
+    ports:
+      - "8083:8082"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      APP_STORAGE: postgres
+      APP_TREE_STRATEGY: custom
+
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/territorial_tree_db"
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   app-mongo:
     build: .
     container_name: territorial-tree-app-mongo
@@ -83,6 +104,26 @@ services:
       mongo:
         condition: service_healthy
 
+  app-mongo-custom:
+    build: .
+    container_name: territorial-tree-app-mongo-custom
+    profiles: ["mongo-custom"]
+
+    ports:
+      - "8084:8082"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: mongo
+      APP_STORAGE: mongo
+      APP_TREE_STRATEGY: custom
+
+      SPRING_MONGODB_URI: "mongodb://mongo:27017/territorial_tree_db"
+      SPRING_MONGODB_DATABASE: territorial_tree_db
+
+    depends_on:
+      mongo:
+        condition: service_healthy
+
   app-memory:
     build: .
     container_name: territorial-tree-app-memory
@@ -95,6 +136,19 @@ services:
       SPRING_PROFILES_ACTIVE: memory
       APP_STORAGE: memory
       APP_TREE_STRATEGY: collections
+
+  app-memory-custom:
+    build: .
+    container_name: territorial-tree-app-memory-custom
+    profiles: ["memory-custom"]
+
+    ports:
+      - "8085:8082"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: memory
+      APP_STORAGE: memory
+      APP_TREE_STRATEGY: custom
 
 volumes:
   postgres_data:
